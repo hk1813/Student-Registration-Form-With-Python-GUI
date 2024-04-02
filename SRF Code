@@ -1,0 +1,93 @@
+import tkinter as tk
+from tkinter import messagebox
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+import re
+
+def generate_pdf(data):
+    try:
+        c = canvas.Canvas("student_registration.pdf", pagesize=letter)
+        c.drawString(100, 750, "Student Registration Form")
+        c.drawString(100, 730, "-" * 50)
+        y = 700
+        for key, value in data.items():
+            c.drawString(100, y, f"{key}: {value}")
+            y -= 20
+        c.save()
+        messagebox.showinfo("Success", "PDF generated successfully!")
+    except Exception as e:
+        messagebox.showerror("Error", f"Failed to generate PDF: {str(e)}")
+
+# ERROR CHECK
+def validate_data(data):
+    
+    if not data['Name']:
+        messagebox.showerror("Error", "Name field cannot be empty.")
+        return False
+    elif not data['AICTE Id'].isdigit():
+        messagebox.showerror("Error", "AICTE Id must be a numeric value.")
+        return False
+    elif not data['Email']:
+        messagebox.showerror("Error", "Email field cannot be empty.")
+        return False
+    elif not re.match(r"[^@]+@[^@]+\.[^@]+", data['Email']):
+        messagebox.showerror("Error", "Invalid email format.")
+        return False
+    elif not data['Phone No.'].isdigit():
+        messagebox.showerror("Error", "Phone No. must be a numeric value.")
+        return False
+    elif not data['College Name']:
+        messagebox.showerror("Error", "College Name field cannot be empty.")
+        return False
+    # Add more validation checks as needed
+    return True
+
+# PDF ENTRY
+def submit_form():
+    data = {
+        "Name": entry_name.get(),
+        "AICTE Id": entry_aicte_id.get(),
+        "Email": entry_email.get(),
+        "Phone No.": entry_phone_no.get(),
+        "College Name": entry_college_name.get(),
+        # Add more fields here
+    }
+    if validate_data(data):
+        generate_pdf(data)
+
+# GUI
+root = tk.Tk()
+root.title("Student Registration Form")
+
+label_name = tk.Label(root, text="Name:")
+label_name.grid(row=0, column=0, padx=10, pady=5, sticky="w")
+entry_name = tk.Entry(root)
+entry_name.grid(row=0, column=1, padx=10, pady=5)
+
+label_aicte_id = tk.Label(root, text="AICTE Id:")
+label_aicte_id.grid(row=1, column=0, padx=10, pady=5, sticky="w")
+entry_aicte_id = tk.Entry(root)
+entry_aicte_id.grid(row=1, column=1, padx=10, pady=5)
+
+label_email = tk.Label(root, text="Email:")
+label_email.grid(row=2, column=0, padx=10, pady=5, sticky="w")
+entry_email = tk.Entry(root)
+entry_email.grid(row=2, column=1, padx=10, pady=5)
+
+label_phone_no = tk.Label(root, text="Phone No.:")
+label_phone_no.grid(row=3, column=0, padx=10, pady=5, sticky="w")
+entry_phone_no = tk.Entry(root)
+entry_phone_no.grid(row=3, column=1, padx=10, pady=5)
+
+label_college_name = tk.Label(root, text="College Name:")
+label_college_name.grid(row=4, column=0, padx=10, pady=5, sticky="w")
+entry_college_name = tk.Entry(root)
+entry_college_name.grid(row=4, column=1, padx=10, pady=5)
+
+# Add more fields as needed
+
+# SUBMIT BUTTON
+submit_button = tk.Button(root, text="Submit", command=submit_form)
+submit_button.grid(row=5, column=0, columnspan=2, pady=10)
+
+root.mainloop()
